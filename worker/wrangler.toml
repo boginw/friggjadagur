@@ -1,0 +1,9 @@
+name = "friggjadagur-reply-bot"
+main = "src/index.js"
+account_id = "5ad7561b1dc784b55808197d6e50cb90"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Optional: also forward incoming mail to a verified Email Routing destination.
+# [vars]
+# FORWARD_TO = "you@example.com"
