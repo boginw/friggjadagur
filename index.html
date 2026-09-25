@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="fo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Er tað fríggjadagur?</title>
+<meta name="description" content="Er tað fríggjadagur í dag? Her fært tú svarið.">
+<meta property="og:title" content="Er tað fríggjadagur?">
+<meta property="og:description" content="Ja? Nei? Her fært tú svarið.">
+<meta property="og:url" content="https://fríggjardagur.fo/">
+<meta name="theme-color" content="#ef303e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 16'%3E%3Crect width='22' height='16' fill='%23fff'/%3E%3Cpath d='M0 8h22M8 0v16' stroke='%23005eb8' stroke-width='4'/%3E%3Cpath d='M0 8h22M8 0v16' stroke='%23ef303e' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #ef303e;
+    --blue: #005eb8;
+    --bg: #dde3e8;
+    --fg: #33414c;
+    --muted: #6b7a86;
+    --fog: rgba(255, 255, 255, .55);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a2127;
+      --fg: #c9d3da;
+      --muted: #7f8d98;
+      --fog: rgba(120, 140, 155, .14);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    transition: background .6s, color .6s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  main { position: relative; z-index: 2; padding: 0 16px; }
+  .question {
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
+    letter-spacing: .02em;
+    color: var(--muted);
+    margin: 0 0 .25em;
+  }
+  #answer {
+    font-family: "Archivo Black", Impact, sans-serif;
+    font-size: clamp(6rem, 32vw, 20rem);
+    line-height: .9;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+    transition: transform .15s;
+  }
+  #answer:active { transform: scale(.96); }
+  #sub {
+    font-size: clamp(1.1rem, 4vw, 1.75rem);
+    font-weight: 600;
+    margin: .6em 0 0;
+    min-height: 1.4em;
+  }
+  footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px;
+    font-size: .85rem;
+    color: var(--muted);
+    z-index: 2;
+    font-variant-numeric: tabular-nums;
+  }
+  footer p { margin: .2em 0; }
+
+  /* NEI: Faroese fog */
+  body.nei::before, body.nei::after {
+    content: "";
+    position: fixed;
+    inset: -20% -50%;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 30% 18% at 20% 30%, var(--fog), transparent 70%),
+      radial-gradient(ellipse 35% 20% at 70% 60%, var(--fog), transparent 70%),
+      radial-gradient(ellipse 25% 15% at 40% 85%, var(--fog), transparent 70%);
+    animation: drift 60s linear infinite alternate;
+    z-index: 1;
+  }
+  body.nei::after { animation-duration: 90s; animation-direction: alternate-reverse; opacity: .7; }
+  @keyframes drift { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
+
+  /* JA: the flag */
+  body.ja { --bg: #fff; --fg: var(--red); --muted: #4a5a68; background: var(--bg); }
+  body.ja #answer { color: var(--red); text-shadow: .045em .045em 0 var(--blue); }
+  body.ja #sub { color: var(--blue); }
+  body.ja::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(var(--red), var(--red)) 0 50% / 100% 1.6vmin no-repeat,
+      linear-gradient(var(--red), var(--red)) 36% 0 / 1.6vmin 100% no-repeat,
+      linear-gradient(var(--blue), var(--blue)) 0 50% / 100% 3.2vmin no-repeat,
+      linear-gradient(var(--blue), var(--blue)) 36% 0 / 3.2vmin 100% no-repeat;
+    opacity: .08;
+    z-index: 1;
+  }
+
+  /* Friday the 13th */
+  body.spooky { --bg: #0b0d0c; --fg: #b9f5c8; --muted: #4f6b57; }
+  body.spooky #answer { animation: flicker 4s infinite; text-shadow: 0 0 .15em #3bff7a88; }
+  @keyframes flicker {
+    0%, 19%, 22%, 62%, 64%, 100% { opacity: 1; }
+    20%, 63% { opacity: .25; }
+  }
+
+  /* Confetti, sheep and friends */
+  .fall {
+    position: fixed;
+    top: -10vh;
+    pointer-events: none;
+    z-index: 3;
+    animation: fall linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(120vh) rotate(var(--spin)); } }
+
+  #sheep {
+    position: fixed;
+    bottom: -80px;
+    font-size: 56px;
+    cursor: pointer;
+    z-index: 4;
+    transition: bottom .5s;
+    user-select: none;
+  }
+  #sheep.peek { bottom: -12px; }
+
+  #toast {
+    position: fixed;
+    top: 16px; left: 50%;
+    transform: translate(-50%, -150%);
+    background: var(--fg);
+    color: var(--bg);
+    padding: .6em 1.1em;
+    border-radius: 999px;
+    font-weight: 600;
+    z-index: 5;
+    transition: transform .3s;
+    max-width: calc(100vw - 32px);
+  }
+  #toast.show { transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body class="nei">
+<main>
+  <p class="question">Er tað fríggjadagur?</p>
+  <h1 id="answer">…</h1>
+  <p id="sub"></p>
+</main>
+<footer>
+  <p id="countdown"></p>
+  <p id="clock"></p>
+</footer>
+<div id="sheep" aria-hidden="true">🐑</div>
+<div id="toast" role="status"></div>
+
+<script>
+(() => {
+  const TZ = "Atlantic/Faroe";
+  const DAYS = ["sunnudagur", "mánadagur", "týsdagur", "mikudagur", "hósdagur", "fríggjadagur", "leygardagur"];
+  const $ = (id) => document.getElementById(id);
+  const pick = (xs) => xs[Math.floor(Math.random() * xs.length)];
+  const pad = (n) => String(n).padStart(2, "0");
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // --- Time -----------------------------------------------------------------
+  // "Wall" time: a Date whose UTC fields hold the Faroese local clock.
+  // ?dato=2026-04-03T16:30 lets you time travel (the clock keeps ticking).
+  const loadedAt = Date.now();
+  const travel = (() => {
+    const m = /^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d):(\d\d))?/.exec(new URLSearchParams(location.search).get("dato") || "");
+    return m ? Date.UTC(m[1], m[2] - 1, m[3], m[4] || 12, m[5] || 0) : null;
+  })();
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    timeZone: TZ, hourCycle: "h23",
+    year: "numeric", month: "numeric", day: "numeric",
+    hour: "numeric", minute: "numeric", second: "numeric",
+  });
+
+  function wallNow() {
+    if (travel !== null) return new Date(travel + Date.now() - loadedAt);
+    const p = Object.fromEntries(fmt.formatToParts(new Date()).map((x) => [x.type, +x.value]));
+    return new Date(Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second));
+  }
+
+  function easter(y) { // Anonymous Gregorian algorithm
+    const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4;
+    const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+    return Date.UTC(y, month - 1, day);
+  }
+
+  // --- The important part ---------------------------------------------------
+  function verdict(t) {
+    const dow = t.getUTCDay(), h = t.getUTCHours();
+    const y = t.getUTCFullYear(), mo = t.getUTCMonth() + 1, d = t.getUTCDate();
+    const md = `${mo}-${d}`;
+    const midnight = Date.UTC(y, mo - 1, d);
+    const goodFriday = midnight === easter(y) - 2 * 864e5;
+    const nov1 = new Date(Date.UTC(y, 10, 1)).getUTCDay();
+    const blackFriday = mo === 11 && d === 1 + ((4 - nov1 + 7) % 7) + 22;
+
+    if (dow === 5) {
+      if (md === "4-1") return { ja: true, fool: true, sub: "Aprilsnarr! Ella… nei, tað er satt! 🐟" };
+      if (goodFriday) return { ja: true, sub: "Langi fríggjadagur. Og hann er langur." };
+      if (d === 13) return { ja: true, theme: "spooky", sub: "…men tann 13. Ver varin. 👻" };
+      if (blackFriday) return { ja: true, sub: "Black Friday. Keyp einki." };
+      if (md === "7-29") return { ja: true, sub: "OG tað er Ólavsøka! Betri verður tað ikki. 🎉" };
+      if (md === "12-24") return { ja: true, sub: "…og jólaaftan. Glaðilig jól! 🎄" };
+      if (h < 5) return { ja: true, sub: "…tøkniliga sæð. Far í song." };
+      if (h >= 16) return { ja: true, sub: ["Klokkan er yvir fýra. Far heim!", "Vikuskiftið er byrjað. 🍻"] };
+      return { ja: true, sub: ["Góðan fríggjadag!", "Endiliga.", "Vikuskiftið er í nánd.", "Tað er loyvt at gleða seg."] };
+    }
+
+    const holidays = {
+      "1-1": "…men tað er nýggjársdagur. 🎆",
+      "4-25": "…men tað er flaggdagur! 🇫🇴",
+      "7-28": "…men tað er ólavsøkuaftan! 🎉",
+      "7-29": "…men tað er Ólavsøka! 🎉",
+      "12-24": "…men tað er jólaaftan. 🎄",
+      "12-25": "…men tað er jóladagur. 🎄",
+      "12-31": "…men tað er nýggjársaftan. 🎆",
+    };
+    if (md === "4-1") return { ja: false, fool: true, sub: "Aprilsnarr! 🐟" };
+    if (holidays[md]) return { ja: false, sub: holidays[md] };
+
+    const subs = {
+      0: "Tað er sunnudagur. Fríggjadagur er langt burturi.",
+      1: "Tað er mánadagur. Orsaka.",
+      2: "Tað er týsdagur. Hald út.",
+      3: "Tað er mikudagur. Hálvvegis.",
+      4: h >= 18 ? "Næstan… í morgin!" : "Men í morgin!",
+      6: "Tað var í gjár.",
+    };
+    return { ja: false, sub: subs[dow] };
+  }
+
+  // --- Rendering ------------------------------------------------------------
+  let current = null;   // key of the verdict currently shown
+  let clicks = 0;
+  let foolTimer = null;
+
+  function render(force) {
+    const t = wallNow();
+    const v = verdict(t);
+    const key = `${v.ja}|${t.getUTCDate()}|${v.sub}`;
+    const day = t.getUTCDay();
+
+    // Countdown + clock tick every second
+    const hms = `${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}:${pad(t.getUTCSeconds())}`;
+    $("clock").textContent = `Klokkan í Føroyum: ${hms} · ${DAYS[day]}${travel !== null ? " · ⏳ tíðarferð" : ""}`;
+    const midnight = Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate());
+    const target = day === 5 ? midnight + 864e5 : midnight + ((5 - day + 7) % 7) * 864e5;
+    const left = Math.max(0, Math.floor((target - t) / 1000));
+    const dd = Math.floor(left / 86400), rest = left % 86400;
+    const clock = `${pad(Math.floor(rest / 3600))}:${pad(Math.floor(rest / 60) % 60)}:${pad(rest % 60)}`;
+    $("countdown").textContent = day === 5
+      ? `Fríggjadagurin endar um ${clock}`
+      : `Fríggjadagur um ${dd ? dd + "d " : ""}${clock}`;
+
+    if (key === current && !force) return;
+    const flippedToFriday = current !== null && v.ja && !current.startsWith("true");
+    current = key;
+    clicks = 0;
+    clearTimeout(foolTimer);
+
+    const show = (ja, sub) => {
+      document.body.className = ja ? (v.theme || "ja") : "nei";
+      $("answer").textContent = ja ? "JA" : "NEI";
+      $("sub").textContent = sub;
+    };
+
+    if (v.fool) {
+      // April fools: show the opposite first, then own up.
+      show(!v.ja, "");
+      foolTimer = setTimeout(() => { show(v.ja, v.sub); if (v.ja) confetti(40); }, 2500);
+    } else {
+      show(v.ja, Array.isArray(v.sub) ? pick(v.sub) : v.sub);
+    }
+
+    if (flippedToFriday) { confetti(150); toast("Tað er vorðið fríggjadagur!! 🎉"); }
+    else if (v.ja && !v.fool && v.theme !== "spooky") confetti(40);
+  }
+
+  // --- Fun ------------------------------------------------------------------
+  function rain(chars, n, { size = [8, 14], dur = [2.5, 5] } = {}) {
+    if (reduceMotion) return;
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement("div");
+      el.className = "fall";
+      const c = pick(chars);
+      if (c.startsWith("#")) {
+        const s = size[0] + Math.random() * (size[1] - size[0]);
+        el.style.width = s + "px";
+        el.style.height = s * 0.45 + "px";
+        el.style.background = c;
+      } else {
+        el.textContent = c;
+        el.style.fontSize = size[0] + Math.random() * (size[1] - size[0]) + "px";
+      }
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.setProperty("--spin", (Math.random() * 1440 - 720) + "deg");
+      el.style.animationDuration = dur[0] + Math.random() * (dur[1] - dur[0]) + "s";
+      el.style.animationDelay = Math.random() * 1.5 + "s";
+      el.addEventListener("animationend", () => el.remove());
+      document.body.appendChild(el);
+    }
+  }
+  const confetti = (n) => rain(["#ef303e", "#005eb8", "#ffffff", "#ef303e"], n);
+  const sheepRain = () => rain(["🐑"], 70, { size: [28, 64], dur: [3, 6] });
+
+  let toastTimer;
+  function toast(msg) {
+    const el = $("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
+  }
+
+  // Clicking the answer
+  $("answer").addEventListener("click", () => {
+    if (document.body.classList.contains("nei")) {
+      clicks++;
+      const nag = {
+        3: "Nei. Framvegis nei.",
+        5: "Tað hjálpir ikki at klikkja.",
+        7: "Nú er tað nokk!",
+        9: "…",
+      };
+      if (nag[clicks]) $("sub").textContent = nag[clicks];
+      if (clicks === 11) {
+        $("answer").textContent = "JA?";
+        $("sub").textContent = "Ok, ok…";
+        setTimeout(() => {
+          $("answer").textContent = "NEI";
+          $("sub").textContent = "Bara spæl. 😏";
+          clicks = 0;
+        }, 1500);
+      }
+    } else {
+      confetti(60);
+    }
+  });
+
+  // Keyboard secrets
+  const konami = "ArrowUp ArrowUp ArrowDown ArrowDown ArrowLeft ArrowRight ArrowLeft ArrowRight b a";
+  const words = {
+    fredag: "Hetta er ikki erdetfredag.dk – her siga vit fríggjadagur. 🇫🇴",
+    friday: "Hey! Speak Faroese. JA = yes, NEI = no. 🐑",
+    freitag: "Nein, hier sagen wir fríggjadagur.",
+    torsdag: "Hósdagur, takk.",
+    skerpikjot: "🍖 Nú gjørdist tú svangur, ikki?",
+    baa: "Mæææ! 🐑",
+  };
+  let keys = [];
+  addEventListener("keydown", (e) => {
+    keys = [...keys, e.key].slice(-12);
+    if (keys.slice(-10).join(" ") === konami) {
+      toast("Føroyar = seyðaoyggjarnar 🐑");
+      sheepRain();
+      keys = [];
+      return;
+    }
+    const typed = keys.filter((k) => k.length === 1).join("").toLowerCase()
+      .replace(/ø/g, "o");
+    for (const [w, msg] of Object.entries(words)) {
+      if (typed.endsWith(w)) { toast(msg); if (w === "baa") sheepRain(); keys = []; }
+    }
+  });
+
+  // A shy sheep that sometimes peeks up from the bottom
+  let found = 0;
+  const sheep = $("sheep");
+  function peek() {
+    sheep.style.left = 10 + Math.random() * 75 + "vw";
+    sheep.classList.add("peek");
+    setTimeout(() => sheep.classList.remove("peek"), 3500);
+    setTimeout(peek, 25000 + Math.random() * 35000);
+  }
+  setTimeout(peek, 12000 + Math.random() * 15000);
+  sheep.addEventListener("click", () => {
+    found++;
+    sheep.classList.remove("peek");
+    toast(found === 1 ? "Mæ! Tú fann ein seyð. 🐑" : `Mæ! Tú hevur funnið ${found} seyðir.`);
+    if (found === 7) setTimeout(() => { toast("Sjey seyðir! Her er ein flokkur."); sheepRain(); }, 1500);
+  });
+
+  // Tab title when you wander off
+  const title = document.title;
+  addEventListener("visibilitychange", () => {
+    document.title = document.hidden ? "Kom aftur! 🐑" : title;
+  });
+
+  // Hi, fellow developer
+  console.log(
+    "%c🐑 Hey, tú kikar í koduna!\n%cRoyn ?dato=2026-04-03T17:00 fyri at ferðast í tíðini. Og kanska Konami-koduna…",
+    "font: bold 16px sans-serif; color: #ef303e",
+    "color: #005eb8"
+  );
+
+  render(true);
+  setInterval(render, 1000);
+})();
+</script>
+</body>
+</html>
