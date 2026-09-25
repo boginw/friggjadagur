@@ -7,7 +7,7 @@
 <meta name="description" content="Er tað fríggjadagur í dag? Her fært tú svarið.">
 <meta property="og:title" content="Er tað fríggjadagur?">
 <meta property="og:description" content="Ja? Nei? Her fært tú svarið.">
-<meta property="og:url" content="https://fríggjardagur.fo/">
+<meta property="og:url" content="https://fríggjadagur.fo/">
 <meta name="theme-color" content="#ef303e">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 16'%3E%3Crect width='22' height='16' fill='%23fff'/%3E%3Cpath d='M0 8h22M8 0v16' stroke='%23005eb8' stroke-width='4'/%3E%3Cpath d='M0 8h22M8 0v16' stroke='%23ef303e' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,6 +53,16 @@
     color: var(--muted);
     margin: 0 0 .25em;
   }
+  .typo {
+    display: inline-block;
+    color: var(--red);
+    text-decoration: line-through 3px;
+    overflow: hidden;
+    vertical-align: bottom;
+    max-width: 1ch;
+    transition: max-width .6s, opacity .6s;
+  }
+  .typo.gone { max-width: 0; opacity: 0; }
   #answer {
     font-family: "Archivo Black", Impact, sans-serif;
     font-size: clamp(6rem, 32vw, 20rem);
@@ -164,7 +174,7 @@
 </head>
 <body class="nei">
 <main>
-  <p class="question">Er tað fríggjadagur?</p>
+  <p class="question" id="question">Er tað fríggjadagur?</p>
   <h1 id="answer">…</h1>
   <p id="sub"></p>
 </main>
@@ -414,6 +424,18 @@
   addEventListener("visibilitychange", () => {
     document.title = document.hidden ? "Kom aftur! 🐑" : title;
   });
+
+  // Came via fríggjaRdagur.fo? The other domain forwards here with ?skeivt.
+  const params = new URLSearchParams(location.search);
+  if (params.has("skeivt")) {
+    params.delete("skeivt");
+    history.replaceState(null, "", location.pathname + (params.size ? "?" + params : "") + location.hash);
+    $("question").innerHTML = 'Er tað fríggja<span class="typo">r</span>dagur?';
+    setTimeout(() => {
+      $("question").querySelector(".typo").classList.add("gone");
+      toast("Tað heitir fríggjadagur. Einki R. 😉");
+    }, 1200);
+  }
 
   // Hi, fellow developer
   console.log(

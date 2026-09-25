@@ -1,8 +1,10 @@
-# fríggjardagur.fo
+# fríggjadagur.fo
 
 Er tað fríggjadagur? A tiny single-page site that answers one question, in Faroese, using Faroese time (`Atlantic/Faroe`).
 
-Hosted on GitHub Pages, served at [fríggjardagur.fo](https://fríggjardagur.fo) (`xn--frggjardagur-tfb.fo` in punycode, which is what `CNAME` holds).
+Hosted on GitHub Pages, served at [fríggjadagur.fo](https://fríggjadagur.fo) (`xn--frggjadagur-pcb.fo` in punycode, which is what `CNAME` holds).
+
+The misspelled [fríggjardagur.fo](https://fríggjardagur.fo) is served from a separate tiny repo that forwards visitors here.
 
 ## Time travel
 
